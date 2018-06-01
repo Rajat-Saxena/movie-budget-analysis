@@ -1,8 +1,9 @@
 package com.rajat.saxena
 
-import org.apache.spark.SparkConf
-
 object App {
 
-  val conf = new SparkConf().setAppName("Movie Budget Analysis").setMaster("local")
+  def main(args: Array[String]) {
+    //val conf = new SparkConf().setAppName("Movie Budget Analysis").setMaster("local")
+    println("Hello world")
+  }
 }
