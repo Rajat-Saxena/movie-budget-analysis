@@ -67,14 +67,14 @@ object App {
     println("Most Expensive Movies of All Time")
     println("********************************************")
     val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._4, movie._3), ascending = false)
-      .map(row => row._1 + "\t" + row._2 + "\t" + formatter.format(row._4) + "\t" + formatter.format(row._5))
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5))
     mostExpensiveMoviesOfAllTime.take(25).foreach(println)
 
-    println("\n********************************************")
+    println("\n****************************************************************")
     println("Most Expensive Movies of All Time (Adjusted for Inflation)")
-    println("********************************************")
+    println("****************************************************************")
     val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
-      .map(row => row._1 + "\t" + row._2 + "\t" + formatter.format(row._4) + "\t" + formatter.format(row._5))
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5))
     mostExpensiveMoviesOfAllTimeAdjusted.take(25).foreach(println)
   }
 }
