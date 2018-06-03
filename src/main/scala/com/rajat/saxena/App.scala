@@ -20,8 +20,9 @@ object App {
 
     val movieData = sc.textFile("src/main/resources/AllMoviesDetailsCleaned.csv")
       .map(_.split(";(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)"))
-      .filter(row => row(10).length == 10)
-      .filter(row => row(14) == "Released")
+      .filter(_(10).length == 10)
+      .filter(_(14) == "Released")
+      .filter(_(18).toInt > 5)
 
     /* Objective:
      - (adjust budget for inflation)
