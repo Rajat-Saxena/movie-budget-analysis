@@ -48,7 +48,8 @@ object App {
         row._1(10).substring(6,10).toInt, // Int - Release Year
         row._1(17).toFloat,               // Float - Avg Rating
         row._1(1).toInt,                  // Int - Budget
-        row._2                            // Int - Converted Budget
+        row._2,                            // Int - Converted Budget
+        row._1(8)                         // String - Production Companies
       ))
 
     // Find most expensive movies
@@ -59,7 +60,7 @@ object App {
     println("\n*** Program executed for: " + duration + " seconds ***")
   }
 
-  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int)]) = {
+  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String)]) = {
 
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
@@ -67,14 +68,14 @@ object App {
     println("Most Expensive Movies of All Time")
     println("********************************************")
     val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._4, movie._3), ascending = false)
-      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5))
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
     mostExpensiveMoviesOfAllTime.take(25).foreach(println)
 
     println("\n****************************************************************")
     println("Most Expensive Movies of All Time (Adjusted for Inflation)")
     println("****************************************************************")
     val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
-      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5))
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
     mostExpensiveMoviesOfAllTimeAdjusted.take(25).foreach(println)
   }
 }
