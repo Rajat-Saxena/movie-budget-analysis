@@ -61,8 +61,18 @@ object App {
 
   def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int)]) = {
 
-    val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
-
+    println("********************************************")
+    println("Most Expensive Movies of All Time")
+    println("********************************************")
+    val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._4, movie._3), ascending = false)
+        .map(row => "Title:" + row._1 + "\tYear:" + row._2 + "\tBudget:" + row._4 + "\tAdjust Budged:" + row._5)
     mostExpensiveMoviesOfAllTime.take(25).foreach(println)
+
+    println("\n********************************************")
+    println("Most Expensive Movies of All Time (Adjusted for Inflation)")
+    println("********************************************")
+    val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
+      .map(row => "Title:" + row._1 + "\tYear:" + row._2 + "\tBudget:" + row._4 + "\tAdjust Budged:" + row._5)
+    mostExpensiveMoviesOfAllTimeAdjusted.take(25).foreach(println)
   }
 }
