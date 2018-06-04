@@ -1,4 +1,4 @@
-package com.rajat.saxena
+package com.rajat
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
@@ -58,24 +58,34 @@ object App {
     val movieDataCleaned = movieData
       .filter(_ != header)
       .zip(convertedBudgets)
-      .map(row => (row._1(16),              // String - Title
-        row._1(10).substring(6,10).toInt,   // Int - Release Year
-        row._1(17).toFloat,                 // Float - Avg Rating
-        row._1(1).toInt,                    // Int - Budget
-        row._2,                             // Int - Converted Budget
-        row._1(8)                           // String - Production Companies
+      .map(row => (row._1(16),              // _1 String  Title
+        row._1(10).substring(6,10).toInt,   // _2 Int     Release Year
+        row._1(17).toFloat,                 // _3 Float   Avg Rating
+        row._1(1).toInt,                    // _4 Int     Budget
+        row._2,                             // _5 Int     Converted Budget
+        row._1(8),                          // _6 String  Production Companies
+        row._1(2)                           // _7 String  Genre
       ))
 
     // Objective 1: Find most expensive movies
-    mostExpensiveMoviesOfAllTime(movieDataCleaned)
+    //mostExpensiveMoviesOfAllTime(movieDataCleaned)
+
+    // Objective 2: Find genres that are most expensive
+    mostExpensiveGenres(movieDataCleaned)
 
     // Keep track of end time
     val duration = (System.nanoTime - appStartTime) / 1e9d
     println("\n*** Program executed for: " + duration + " seconds ***")
   }
 
-  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String)]) = {
+  /**
+    * Function to return the most expensive movies of all time
+    * Prints top 25 movies in terms of budget (both adjusted for inflation and without)
+    * @param movieDataCleaned
+    */
+  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String)]) = {
 
+    // Formatter to print budget in readable amount format
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
     println("********************************************")
@@ -83,6 +93,7 @@ object App {
     println("********************************************")
     val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._4, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
+      .zipWithIndex().map(row => (row._2, row._1))
     mostExpensiveMoviesOfAllTime.take(25).foreach(println)
 
     println("\n****************************************************************")
@@ -90,6 +101,26 @@ object App {
     println("****************************************************************")
     val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
+      .zipWithIndex().map(row => (row._2, row._1))
     mostExpensiveMoviesOfAllTimeAdjusted.take(25).foreach(println)
+  }
+
+  /**
+    * Function to return the genres of most expensive movies
+    * Prints genres of the top 100 expensive movies of all time
+    * @param movieDataCleaned
+    */
+  def mostExpensiveGenres(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String)]) = {
+
+    val genreCountOfTop100ExpensiveMovies = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
+      .map(_._7)
+      .zipWithIndex()
+      .filter(_._2 < 100)
+      .map(_._1)
+      //.flatMap(_.split("|"))
+      .map((_, 1))
+      .reduceByKey(_ + _)
+
+    genreCountOfTop100ExpensiveMovies.foreach(println)
   }
 }
