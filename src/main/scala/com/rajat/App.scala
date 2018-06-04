@@ -7,9 +7,9 @@ object App {
 
   /* Objectives:
    + (adjust budget for inflation)
-   ~ Budget of the movie wrt GDP of the country (most expensively made movies of all time?)
+   + (most expensively made movies of all time?)
    * Awards vs Budget (do expensive movies win awards?)
-   * Genre vs Budget (does a particular genre require high budget?)
+   + Genre vs Budget (does a particular genre require high budget?)
    * Experience of director vs Budget (do new directors get high budgets?)
    * Best small budget movies (maybe budgets in the bottom 10%?)
    * Which production companies have maximum investments/awards/roi?
@@ -88,32 +88,32 @@ object App {
     // Formatter to print budget in readable amount format
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
-    println("********************************************")
-    println("Most Expensive Movies of All Time")
-    println("********************************************")
+    // Sort by budget to find most expensive movies of all time
+    println("Most Expensive Movies of All Time:")
     val mostExpensiveMoviesOfAllTime = movieDataCleaned
       .sortBy(movie => (movie._4, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
-      .zipWithIndex()
-      .map(row => (row._2, row._1))
 
+    // Save to file
     mostExpensiveMoviesOfAllTime
       .coalesce(1)
       .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTime.txt")
+
+    // Print results to console
     mostExpensiveMoviesOfAllTime.take(50).foreach(println)
 
-    println("\n****************************************************************")
-    println("Most Expensive Movies of All Time (Adjusted for Inflation)")
-    println("****************************************************************")
+    // Sort by adjusted budget to find most expensive movies of all time
+    println("Most Expensive Movies of All Time (Adjusted for Inflation):")
     val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned
       .sortBy(movie => (movie._5, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
-      .zipWithIndex()
-      .map(row => (row._2, row._1))
 
+    // Save to file
     mostExpensiveMoviesOfAllTimeAdjusted
         .coalesce(1)
         .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTimeAdjusted.txt")
+
+    // Print results to console
     mostExpensiveMoviesOfAllTimeAdjusted.take(50).foreach(println)
   }
 
@@ -135,9 +135,12 @@ object App {
       .sortBy(_._2, ascending = false)
       .map(row => (row._1 + "\t" + row._2))
 
+    // Save to file
     genreCountOfTop100ExpensiveMovies
       .coalesce(1)
       .saveAsTextFile("target/movie-budget-analysis/genreCountOfTop100ExpensiveMovies.txt")
+
+    // Print results to console
     genreCountOfTop100ExpensiveMovies.foreach(println)
   }
 }
