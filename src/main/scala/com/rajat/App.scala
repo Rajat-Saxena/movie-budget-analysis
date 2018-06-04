@@ -15,6 +15,16 @@ object App {
    * Which production companies have maximum investments/awards/roi?
    */
 
+  /**
+    * Objectives:
+    * 0. Adjust movie budget for inflation
+    * 1. Most expensively made movies of all time
+    * 2. Genre of most expensive movies
+    * 3. Best small budget movies
+    * 4. Production company of most expensive movies
+    * 5. Does high budget mean a good movie?
+    * @param args
+    */
   def main(args: Array[String]) {
     // Keep track of start time
     val appStartTime = System.nanoTime
@@ -37,16 +47,18 @@ object App {
     // Split by semicolon, but skip semicolon present in text
     // Filter such that release date of movie is present and status of movie is "Released"
     // Filter such that minimum 5 votes are logged for the movie
+    // Filter such that budget is greater than 0
     val movieData = sc.textFile("src/main/resources/AllMoviesDetailsCleaned.csv")
       .map(_.split(";(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)"))
       .filter(_(10).length == 10)
       .filter(_(14) == "Released")
       .filter(_(18).toInt >= 5)
+      .filter(_(1).toInt > 0)
 
     // Get first row from main movie data, contains column names and needs to be filtered
     val header = movieData.first()
 
-    // Calculate adjusted budgets using CPI
+    // Objective 0: Calculate adjusted budgets using CPI
     // Formula to calculate inflated value:
     // ((new CPI - oldCPI)/oldCPI + 1) * oldValue
     val convertedBudgets = movieData
@@ -64,7 +76,8 @@ object App {
         row._1(1).toInt,                    // _4 Int     Budget
         row._2,                             // _5 Int     Converted Budget
         row._1(8),                          // _6 String  Production Companies
-        row._1(2)                           // _7 String  Genre
+        row._1(2),                          // _7 String  Genre
+        row._1(18).toInt                    // _8 Int     Number of votes
       )).persist()
 
     // Objective 1: Find most expensive movies
@@ -72,6 +85,9 @@ object App {
 
     // Objective 2: Find genres that are most expensive
     mostExpensiveGenres(movieDataCleaned)
+
+    // Objective 3: Find best small budget movies
+    bestSmallBudgetMovies(movieDataCleaned)
 
     // Keep track of end time
     val duration = (System.nanoTime - appStartTime) / 1e9d
@@ -83,7 +99,7 @@ object App {
     * Prints top 25 movies in terms of budget (both adjusted for inflation and without)
     * @param movieDataCleaned
     */
-  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String)]) = {
+  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
 
     // Formatter to print budget in readable amount format
     val formatter = java.text.NumberFormat.getCurrencyInstance
@@ -97,7 +113,7 @@ object App {
     // Save to file
     mostExpensiveMoviesOfAllTime
       .coalesce(1)
-      .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTime.txt")
+      .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTime")
 
     // Print results to console
     mostExpensiveMoviesOfAllTime.take(50).foreach(println)
@@ -111,7 +127,7 @@ object App {
     // Save to file
     mostExpensiveMoviesOfAllTimeAdjusted
         .coalesce(1)
-        .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTimeAdjusted.txt")
+        .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTimeAdjusted")
 
     // Print results to console
     mostExpensiveMoviesOfAllTimeAdjusted.take(50).foreach(println)
@@ -122,7 +138,7 @@ object App {
     * Prints genres of the top 100 expensive movies of all time
     * @param movieDataCleaned
     */
-  def mostExpensiveGenres(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String)]) = {
+  def mostExpensiveGenres(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
 
     val genreCountOfTop100ExpensiveMovies = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
       .map(_._7).map(_.trim())
@@ -138,9 +154,45 @@ object App {
     // Save to file
     genreCountOfTop100ExpensiveMovies
       .coalesce(1)
-      .saveAsTextFile("target/movie-budget-analysis/genreCountOfTop100ExpensiveMovies.txt")
+      .saveAsTextFile("target/movie-budget-analysis/genreCountOfTop100ExpensiveMovies")
 
     // Print results to console
     genreCountOfTop100ExpensiveMovies.foreach(println)
+  }
+
+  /**
+    * Function to return the best small budget movies
+    * Prints best movies made with budget in first quartile (25th percentile)
+    * @param movieDataCleaned
+    */
+  def bestSmallBudgetMovies(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
+
+    // Formatter to print budget in readable amount format
+    val formatter = java.text.NumberFormat.getCurrencyInstance
+
+    // Find value marking the first quartile
+    val firstQuartile = movieDataCleaned.count()/4
+    println("First quartile marked at: "  + firstQuartile)
+
+    // Find movies with budget in the first quartile,
+    // and having a rating of at least 6.0
+    // and having at least 10 votes
+    val bestSmallBudgetMovies = movieDataCleaned
+      .filter(_._3 >= 6.0)
+      .filter(_._8 >= 10)
+      .sortBy(movie => (movie._5, movie._3), ascending = true)
+      .zipWithIndex()
+      .filter(_._2 <= firstQuartile)
+      .map(_._1)
+      .sortBy(_._3, ascending = false)
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._5) + " | " + row._3 + "|" + row._8)
+
+    // Save to file
+    bestSmallBudgetMovies
+      .coalesce(1)
+      .saveAsTextFile("target/movie-budget-analysis/bestSmallBudgetMovies")
+
+    // Print results to console
+    bestSmallBudgetMovies.foreach(println)
   }
 }
