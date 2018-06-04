@@ -185,7 +185,7 @@ object App {
       .filter(_._2 <= firstQuartile)
       .map(_._1)
       .sortBy(_._3, ascending = false)
-      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._5) + " | " + row._3 + "|" + row._8)
+      .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._5) + " | " + row._3 + " | " + row._8)
 
     // Save to file
     bestSmallBudgetMovies
