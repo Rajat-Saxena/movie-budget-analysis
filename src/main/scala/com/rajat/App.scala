@@ -113,7 +113,7 @@ object App {
     // Save to file
     mostExpensiveMoviesOfAllTime
       .coalesce(1)
-      .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTime")
+      .saveAsTextFile("target/ouput/mostExpensiveMoviesOfAllTime")
 
     // Print results to console
     mostExpensiveMoviesOfAllTime.take(50).foreach(println)
@@ -127,7 +127,7 @@ object App {
     // Save to file
     mostExpensiveMoviesOfAllTimeAdjusted
         .coalesce(1)
-        .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTimeAdjusted")
+        .saveAsTextFile("target/ouput/mostExpensiveMoviesOfAllTimeAdjusted")
 
     // Print results to console
     mostExpensiveMoviesOfAllTimeAdjusted.take(50).foreach(println)
@@ -154,7 +154,7 @@ object App {
     // Save to file
     genreCountOfTop100ExpensiveMovies
       .coalesce(1)
-      .saveAsTextFile("target/movie-budget-analysis/genreCountOfTop100ExpensiveMovies")
+      .saveAsTextFile("target/ouput/genreCountOfTop100ExpensiveMovies")
 
     // Print results to console
     genreCountOfTop100ExpensiveMovies.foreach(println)
@@ -190,7 +190,7 @@ object App {
     // Save to file
     bestSmallBudgetMovies
       .coalesce(1)
-      .saveAsTextFile("target/movie-budget-analysis/bestSmallBudgetMovies")
+      .saveAsTextFile("target/ouput/bestSmallBudgetMovies")
 
     // Print results to console
     bestSmallBudgetMovies.foreach(println)
