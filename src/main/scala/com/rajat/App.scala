@@ -65,10 +65,10 @@ object App {
         row._2,                             // _5 Int     Converted Budget
         row._1(8),                          // _6 String  Production Companies
         row._1(2)                           // _7 String  Genre
-      ))
+      )).persist()
 
     // Objective 1: Find most expensive movies
-    //mostExpensiveMoviesOfAllTime(movieDataCleaned)
+    mostExpensiveMoviesOfAllTime(movieDataCleaned)
 
     // Objective 2: Find genres that are most expensive
     mostExpensiveGenres(movieDataCleaned)
@@ -91,18 +91,30 @@ object App {
     println("********************************************")
     println("Most Expensive Movies of All Time")
     println("********************************************")
-    val mostExpensiveMoviesOfAllTime = movieDataCleaned.sortBy(movie => (movie._4, movie._3), ascending = false)
+    val mostExpensiveMoviesOfAllTime = movieDataCleaned
+      .sortBy(movie => (movie._4, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
-      .zipWithIndex().map(row => (row._2, row._1))
-    mostExpensiveMoviesOfAllTime.take(25).foreach(println)
+      .zipWithIndex()
+      .map(row => (row._2, row._1))
+
+    mostExpensiveMoviesOfAllTime
+      .coalesce(1)
+      .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTime.txt")
+    mostExpensiveMoviesOfAllTime.take(50).foreach(println)
 
     println("\n****************************************************************")
     println("Most Expensive Movies of All Time (Adjusted for Inflation)")
     println("****************************************************************")
-    val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
+    val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned
+      .sortBy(movie => (movie._5, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
-      .zipWithIndex().map(row => (row._2, row._1))
-    mostExpensiveMoviesOfAllTimeAdjusted.take(25).foreach(println)
+      .zipWithIndex()
+      .map(row => (row._2, row._1))
+
+    mostExpensiveMoviesOfAllTimeAdjusted
+        .coalesce(1)
+        .saveAsTextFile("target/movie-budget-analysis/mostExpensiveMoviesOfAllTimeAdjusted.txt")
+    mostExpensiveMoviesOfAllTimeAdjusted.take(50).foreach(println)
   }
 
   /**
@@ -113,14 +125,19 @@ object App {
   def mostExpensiveGenres(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String)]) = {
 
     val genreCountOfTop100ExpensiveMovies = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
-      .map(_._7)
+      .map(_._7).map(_.trim())
       .zipWithIndex()
       .filter(_._2 < 100)
       .map(_._1)
-      //.flatMap(_.split("|"))
+      .flatMap(_.split("\\|"))
       .map((_, 1))
-      .reduceByKey(_ + _)
+      .reduceByKey(_+_)
+      .sortBy(_._2, ascending = false)
+      .map(row => (row._1 + "\t" + row._2))
 
+    genreCountOfTop100ExpensiveMovies
+      .coalesce(1)
+      .saveAsTextFile("target/movie-budget-analysis/genreCountOfTop100ExpensiveMovies.txt")
     genreCountOfTop100ExpensiveMovies.foreach(println)
   }
 }
