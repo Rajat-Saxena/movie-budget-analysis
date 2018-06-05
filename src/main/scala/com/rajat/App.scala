@@ -1,19 +1,12 @@
 package com.rajat
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 object App {
-
-  /* Objectives:
-   + (adjust budget for inflation)
-   + (most expensively made movies of all time?)
-   * Awards vs Budget (do expensive movies win awards?)
-   + Genre vs Budget (does a particular genre require high budget?)
-   * Experience of director vs Budget (do new directors get high budgets?)
-   * Best small budget movies (maybe budgets in the bottom 10%?)
-   * Which production companies have maximum investments/awards/roi?
-   */
 
   /**
     * Objectives:
@@ -23,11 +16,19 @@ object App {
     * 3. Best small budget movies
     * 4. Production company of most expensive movies
     * 5. Does high budget mean a good movie?
+    * Bonus:
+    * x. Calculate revenues of most expensive movies
+    * x. Calculate ROI for production companies of most expensive movies
     * @param args
     */
   def main(args: Array[String]) {
     // Keep track of start time
     val appStartTime = System.nanoTime
+
+    // Timestamp for output directory
+    val timestampFormat = new SimpleDateFormat("ddMMyyyy_hhmmss")
+    val timestamp = timestampFormat.format(Calendar.getInstance.getTime)
+    println("Timestamp: " + timestamp)
 
     // Declare and initialize Spark variables
     val conf = new SparkConf().setAppName("Movie Budget Analysis").setMaster("local")
@@ -78,16 +79,21 @@ object App {
         row._1(8),                          // _6 String  Production Companies
         row._1(2),                          // _7 String  Genre
         row._1(18).toInt                    // _8 Int     Number of votes
-      )).persist()
+      ))
+
+    val movieDataSortedByBudget = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false).persist()
 
     // Objective 1: Find most expensive movies
-    mostExpensiveMoviesOfAllTime(movieDataCleaned)
+    mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
 
     // Objective 2: Find genres that are most expensive
-    mostExpensiveGenres(movieDataCleaned)
+    mostExpensiveGenres(movieDataSortedByBudget, timestamp)
 
     // Objective 3: Find best small budget movies
-    bestSmallBudgetMovies(movieDataCleaned)
+    bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
+
+    // Objective 4: Production companies and expensive movies
+    productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
 
     // Keep track of end time
     val duration = (System.nanoTime - appStartTime) / 1e9d
@@ -97,37 +103,37 @@ object App {
   /**
     * Function to return the most expensive movies of all time
     * Prints top 25 movies in terms of budget (both adjusted for inflation and without)
-    * @param movieDataCleaned
+    * @param movieData
     */
-  def mostExpensiveMoviesOfAllTime(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
+  def mostExpensiveMoviesOfAllTime(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)],
+                                   timestamp: String) = {
 
     // Formatter to print budget in readable amount format
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
     // Sort by budget to find most expensive movies of all time
     println("Most Expensive Movies of All Time:")
-    val mostExpensiveMoviesOfAllTime = movieDataCleaned
+    val mostExpensiveMoviesOfAllTime = movieData
       .sortBy(movie => (movie._4, movie._3), ascending = false)
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
 
     // Save to file
     mostExpensiveMoviesOfAllTime
       .coalesce(1)
-      .saveAsTextFile("target/ouput/mostExpensiveMoviesOfAllTime")
+      .saveAsTextFile("target/output/" + timestamp + "/mostExpensiveMoviesOfAllTime")
 
     // Print results to console
     mostExpensiveMoviesOfAllTime.take(50).foreach(println)
 
     // Sort by adjusted budget to find most expensive movies of all time
     println("Most Expensive Movies of All Time (Adjusted for Inflation):")
-    val mostExpensiveMoviesOfAllTimeAdjusted = movieDataCleaned
-      .sortBy(movie => (movie._5, movie._3), ascending = false)
+    val mostExpensiveMoviesOfAllTimeAdjusted = movieData
       .map(row => row._1 + " (" + row._2 + ") | " + formatter.format(row._4) + " | " + formatter.format(row._5) + " | " + row._6)
 
     // Save to file
     mostExpensiveMoviesOfAllTimeAdjusted
         .coalesce(1)
-        .saveAsTextFile("target/ouput/mostExpensiveMoviesOfAllTimeAdjusted")
+        .saveAsTextFile("target/output/" + timestamp + "/mostExpensiveMoviesOfAllTimeAdjusted")
 
     // Print results to console
     mostExpensiveMoviesOfAllTimeAdjusted.take(50).foreach(println)
@@ -136,14 +142,15 @@ object App {
   /**
     * Function to return the genres of most expensive movies
     * Prints genres of the top 100 expensive movies of all time
-    * @param movieDataCleaned
+    * @param movieData
     */
-  def mostExpensiveGenres(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
+  def mostExpensiveGenres(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)],
+                          timestamp: String) = {
 
-    val genreCountOfTop100ExpensiveMovies = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false)
+    val genreCountOfTop500ExpensiveMovies = movieData
       .map(_._7).map(_.trim())
       .zipWithIndex()
-      .filter(_._2 < 100)
+      .filter(_._2 < 500)
       .map(_._1)
       .flatMap(_.split("\\|"))
       .map((_, 1))
@@ -152,32 +159,33 @@ object App {
       .map(row => (row._1 + "\t" + row._2))
 
     // Save to file
-    genreCountOfTop100ExpensiveMovies
+    genreCountOfTop500ExpensiveMovies
       .coalesce(1)
-      .saveAsTextFile("target/ouput/genreCountOfTop100ExpensiveMovies")
+      .saveAsTextFile("target/output/" + timestamp + "/genreCountOfTop500ExpensiveMovies")
 
     // Print results to console
-    genreCountOfTop100ExpensiveMovies.foreach(println)
+    genreCountOfTop500ExpensiveMovies.foreach(println)
   }
 
   /**
     * Function to return the best small budget movies
     * Prints best movies made with budget in first quartile (25th percentile)
-    * @param movieDataCleaned
+    * @param movieData
     */
-  def bestSmallBudgetMovies(movieDataCleaned: RDD[(String, Int, Float, Int, Int, String, String, Int)]) = {
+  def bestSmallBudgetMovies(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)],
+                            timestamp: String) = {
 
     // Formatter to print budget in readable amount format
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
     // Find value marking the first quartile
-    val firstQuartile = movieDataCleaned.count()/4
+    val firstQuartile = movieData.count()/4
     println("First quartile marked at: "  + firstQuartile)
 
     // Find movies with budget in the first quartile,
     // and having a rating of at least 6.0
     // and having at least 10 votes
-    val bestSmallBudgetMovies = movieDataCleaned
+    val bestSmallBudgetMovies = movieData
       .filter(_._3 >= 6.0)
       .filter(_._8 >= 10)
       .sortBy(movie => (movie._5, movie._3), ascending = true)
@@ -190,9 +198,36 @@ object App {
     // Save to file
     bestSmallBudgetMovies
       .coalesce(1)
-      .saveAsTextFile("target/ouput/bestSmallBudgetMovies")
+      .saveAsTextFile("target/output/" + timestamp + "/bestSmallBudgetMovies")
 
     // Print results to console
     bestSmallBudgetMovies.foreach(println)
+  }
+
+  def productionCompaniesAndExpensiveMovies(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)],
+                                            timestamp: String) = {
+
+    // Formatter to print budget in readable amount format
+    val formatter = java.text.NumberFormat.getCurrencyInstance
+
+    // Get the 500 top rated movies
+    val top500 = movieData.zipWithIndex().filter(_._2 < 500).map(_._1)
+
+    // Get count of production companies along with their gross expense for top 500 movies
+    val productionCompaniesAggregate = top500
+      .map(row => (row._6, (1, row._5.toLong)))
+      .reduceByKey(
+        {
+          case ((accCount, accGross), (count, gross)) => (accCount + count, accGross + gross)
+        }
+      )
+      .sortBy(_._2._1, ascending = false)
+      .map(row => row._1 + " | " + row._2._1 + " | " + formatter.format(row._2._2))
+
+    // Save to file
+    productionCompaniesAggregate
+      .coalesce(1)
+      .saveAsTextFile("target/output/" + timestamp + "/productionCompaniesAggregate")
+    productionCompaniesAggregate.foreach(println)
   }
 }
