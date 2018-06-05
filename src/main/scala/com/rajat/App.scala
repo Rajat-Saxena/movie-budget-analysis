@@ -147,6 +147,7 @@ object App {
   def mostExpensiveGenres(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)],
                           timestamp: String) = {
 
+    // Get most common genres for the top 500 most expensive movies
     val genreCountOfTop500ExpensiveMovies = movieData
       .map(_._7).map(_.trim())
       .zipWithIndex()
