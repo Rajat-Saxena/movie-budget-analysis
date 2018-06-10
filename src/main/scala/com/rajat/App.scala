@@ -82,16 +82,16 @@ object App {
     val movieDataSortedByBudget = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false).persist()
 
     // Objective 1: Find most expensive movies
-    //mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
+    mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
 
     // Objective 2: Find genres that are most expensive
-    //mostExpensiveGenres(movieDataSortedByBudget, timestamp)
+    mostExpensiveGenres(movieDataSortedByBudget, timestamp)
 
     // Objective 3: Find best small budget movies
-    //bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
+    bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
 
     // Objective 4: Production companies and expensive movies
-    //productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
+    productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
 
     // Objective 5:
     budgetVersusMovieRating(movieDataSortedByBudget, timestamp)
@@ -236,24 +236,19 @@ object App {
 
   def budgetVersusMovieRating(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)], timestamp: String) = {
 
-    // Formatter to print budget in readable amount format
-    val formatter = java.text.NumberFormat.getCurrencyInstance
-
     // Get the 500 most expensive movies
     val top500Budget = movieData.zipWithIndex().filter(_._2 < 500).map(_._1)
 
-    val top500Rated = movieData.sortBy(_._3, ascending = false)
+    //val top500Rated = movieData.sortBy(_._3, ascending = false)
 
     // Plot graph of budget (x) vs rating (y)
     val xs0 = top500Budget.map(_._5).collect().toList
     val ys0 = top500Budget.map(_._3.round).collect().toList
-    val plot0 = Plot().withScatter(xs0, ys0, ScatterOptions().mode(ScatterMode.Marker))
+    val plot0 = Plot().withScatter(xs0, ys0, ScatterOptions().mode(ScatterMode.Line))
     draw(plot0, "budget-vs-rating", writer.FileOptions(overwrite=true))
 
     // Plot graph of budget (x) vs rating (y)
-    val ys1 = top500Rated.map(_._5).collect().toList
-    val xs1 = top500Rated.map(_._3.round).collect().toList
-    val plot1 = Plot().withScatter(xs1, ys1, ScatterOptions().mode(ScatterMode.Marker))
+    val plot1 = Plot().withScatter(ys0, xs0, ScatterOptions().mode(ScatterMode.Line))
     draw(plot1, "rating-vs-budget", writer.FileOptions(overwrite=true))
   }
 }
