@@ -5,6 +5,7 @@ import java.util.Calendar
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
+import co.theasi.plotly._
 
 object App {
 
@@ -16,9 +17,6 @@ object App {
     * 3. Best small budget movies
     * 4. Production company of most expensive movies
     * 5. Does high budget mean a good movie?
-    * Bonus:
-    * x. Calculate revenues of most expensive movies
-    * x. Calculate ROI for production companies of most expensive movies
     * @param args
     */
   def main(args: Array[String]) {
@@ -84,16 +82,19 @@ object App {
     val movieDataSortedByBudget = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false).persist()
 
     // Objective 1: Find most expensive movies
-    mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
+    //mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
 
     // Objective 2: Find genres that are most expensive
-    mostExpensiveGenres(movieDataSortedByBudget, timestamp)
+    //mostExpensiveGenres(movieDataSortedByBudget, timestamp)
 
     // Objective 3: Find best small budget movies
-    bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
+    //bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
 
     // Objective 4: Production companies and expensive movies
-    productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
+    //productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
+
+    // Objective 5:
+    budgetVersusMovieRating(movieDataSortedByBudget, timestamp)
 
     // Keep track of end time
     val duration = (System.nanoTime - appStartTime) / 1e9d
@@ -230,5 +231,22 @@ object App {
       .coalesce(1)
       .saveAsTextFile("target/output/" + timestamp + "/productionCompaniesAggregate")
     productionCompaniesAggregate.foreach(println)
+  }
+
+  def budgetVersusMovieRating(movieData: RDD[(String, Int, Float, Int, Int, String, String, Int)], timestamp: String) = {
+
+    // Formatter to print budget in readable amount format
+    val formatter = java.text.NumberFormat.getCurrencyInstance
+
+    // Get the 500 most expensive movies
+    /*val top500 = movieData.zipWithIndex().filter(_._2 < 500).map(_._1)
+
+    // Plot graph of budget (x) vs rating (y)
+
+    val xs = top500.map(_._5).map {_}
+    val ys = top500.map(_._3).map {_}*/
+    val p = Plot().withScatter((0 until 100), (300 until 500))
+
+    draw(p, "target/output/basic-scatter", writer.FileOptions(overwrite=true))
   }
 }
