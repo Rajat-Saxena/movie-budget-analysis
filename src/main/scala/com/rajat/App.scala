@@ -3,9 +3,9 @@ package com.rajat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import co.theasi.plotly._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
-import co.theasi.plotly._
 
 object App {
 
@@ -96,6 +96,7 @@ object App {
     // Objective 5:
     budgetVersusMovieRating(movieDataSortedByBudget, timestamp)
 
+    sc.stop()
     // Keep track of end time
     val duration = (System.nanoTime - appStartTime) / 1e9d
     println("\n*** Program executed for: " + duration + " seconds ***")
@@ -239,14 +240,20 @@ object App {
     val formatter = java.text.NumberFormat.getCurrencyInstance
 
     // Get the 500 most expensive movies
-    /*val top500 = movieData.zipWithIndex().filter(_._2 < 500).map(_._1)
+    val top500Budget = movieData.zipWithIndex().filter(_._2 < 500).map(_._1)
+
+    val top500Rated = movieData.sortBy(_._3, ascending = false)
 
     // Plot graph of budget (x) vs rating (y)
+    val xs0 = top500Budget.map(_._5).collect().toList
+    val ys0 = top500Budget.map(_._3.round).collect().toList
+    val plot0 = Plot().withScatter(xs0, ys0, ScatterOptions().mode(ScatterMode.Marker))
+    draw(plot0, "budget-vs-rating", writer.FileOptions(overwrite=true))
 
-    val xs = top500.map(_._5).map {_}
-    val ys = top500.map(_._3).map {_}*/
-    val p = Plot().withScatter((0 until 100), (300 until 500))
-
-    draw(p, "target/output/basic-scatter", writer.FileOptions(overwrite=true))
+    // Plot graph of budget (x) vs rating (y)
+    val ys1 = top500Rated.map(_._5).collect().toList
+    val xs1 = top500Rated.map(_._3.round).collect().toList
+    val plot1 = Plot().withScatter(xs1, ys1, ScatterOptions().mode(ScatterMode.Marker))
+    draw(plot1, "rating-vs-budget", writer.FileOptions(overwrite=true))
   }
 }
