@@ -24,7 +24,7 @@ object App {
     val appStartTime = System.nanoTime
 
     // Timestamp for output directory
-    val timestampFormat = new SimpleDateFormat("ddMMyyyy_hhmmss")
+    val timestampFormat = new SimpleDateFormat("yyyyMMdd_hhmmss")
     val timestamp = timestampFormat.format(Calendar.getInstance.getTime)
     println("Timestamp: " + timestamp)
 
