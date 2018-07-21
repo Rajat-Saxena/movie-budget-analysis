@@ -181,6 +181,6 @@ It seems difficult to find a conclusion from the scatter plots.
 
 ### Conclusion
 While there seems to be no direct correlation between budget and rating, I am going to make a conclusion:
-> For any decent movie (rating > 7), the optimum production budget is $200M.
+> For any decent movie (rating > 7), the optimum production budget is $250M.
 
 Of course, there will always be exceptions.
