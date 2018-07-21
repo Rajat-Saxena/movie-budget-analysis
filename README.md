@@ -7,7 +7,7 @@ The dataset that I have used can be found [here](https://www.kaggle.com/stephane
 ## Preface
 This analysis covers the below points:
 * Finding the most expensive movies of all time.
-* Finding genre of the most expensive movies.
+* Finding genre of expensive movies.
 * Finding the best small budget movies.
 * Identifying production company of most expensive movies.
 * Relation between high budget and a good movie.
@@ -80,3 +80,26 @@ Rank | Movie | Budget | Adjust Budget | Production Company
 23|Spider-Man 2 (2004) | $200,000,000.00 | $265,268,404.00 | Columbia Pictures
 24|X-Men: Days of Future Past (2014) | $250,000,000.00 | $264,583,764.00 | Twentieth Century Fox Film Corporation
 25|The Hobbit: The Battle of the Five Armies (2014) | $250,000,000.00 | $264,583,764.00 | WingNut Films
+
+### Genre of expensive movies
+In order to not distort the results, I picked the 500 most expensive movies and counted the occurrences of various genres. I certainly expected _War_ movies to be higher up, but perhaps there aren't many such movies in the top 500. I am surprised that there are so many _Comedy_ movies in the list.
+
+Rank | Genre | Count
+-----|------|------
+1|Action|284
+2|Adventure|280
+3|Science Fiction|145
+4|Fantasy|140
+5|Thriller|133
+6|Comedy|122
+7|Drama|122
+8|Family|120
+9|Animation|75
+10|Crime|42
+11|Romance|37
+12|Mystery|31
+13|History|30
+14|War|23
+15|Horror|13
+16|Western|10
+17|Music|9
