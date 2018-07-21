@@ -172,14 +172,9 @@ Rank | Production Company | Count | Aggregate Spending
 Does an expensively made movie guarantee success? Or is it always a low-budget movie that gains popularity? Here are two visualizations comparing movie budget and movie rating for the top 500 most expensive movies. I have removed outliers for better comprehension.
 
 #### Movie Rating vs Movie Budget
-<div>
-    <a href="https://plot.ly/~rajatsaxena/28/?share_key=Yr1RPypXEtjti1NgZTPKnj" title="Movie Rating vs Movie Budget" style="display: block; text-align: center;"><img src="https://plot.ly/~rajatsaxena/28.png?share_key=Yr1RPypXEtjti1NgZTPKnj" alt="Movie Rating vs Movie Budget" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a><script data-plotly="rajatsaxena:28" sharekey-plotly="Yr1RPypXEtjti1NgZTPKnj" src="https://plot.ly/embed.js" async></script>
-</div>
-
+<img src="https://plot.ly/~rajatsaxena/28.png?share_key=Yr1RPypXEtjti1NgZTPKnj" alt="Movie Rating vs Movie Budget" style="width:100%;" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
 #### Movie Budget vs Movie Rating
-<div>
-    <a href="https://plot.ly/~rajatsaxena/26/?share_key=7Rpnoxxd1tOcz1tSwYLgMN" title="Movie Budget vs Movie Rating" style="display: block; text-align: center;"><img src="https://plot.ly/~rajatsaxena/26.png?share_key=7Rpnoxxd1tOcz1tSwYLgMN" alt="Movie Budget vs Movie Rating" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a><script data-plotly="rajatsaxena:26" sharekey-plotly="7Rpnoxxd1tOcz1tSwYLgMN" src="https://plot.ly/embed.js" async></script>
-</div>
+<img src="https://plot.ly/~rajatsaxena/26.png?share_key=7Rpnoxxd1tOcz1tSwYLgMN" alt="Movie Budget vs Movie Rating" style="width:100%" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" />
 
 It seems difficult to find a conclusion from the scatter plots.
 
