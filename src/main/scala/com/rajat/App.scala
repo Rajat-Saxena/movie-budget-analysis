@@ -82,7 +82,7 @@ object App {
     val movieDataSortedByBudget = movieDataCleaned.sortBy(movie => (movie._5, movie._3), ascending = false).persist()
 
     // Objective 1: Find most expensive movies
-    mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
+    /*mostExpensiveMoviesOfAllTime(movieDataSortedByBudget, timestamp)
 
     // Objective 2: Find genres that are most expensive
     mostExpensiveGenres(movieDataSortedByBudget, timestamp)
@@ -91,7 +91,7 @@ object App {
     bestSmallBudgetMovies(movieDataSortedByBudget, timestamp)
 
     // Objective 4: Production companies and expensive movies
-    productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)
+    productionCompaniesAndExpensiveMovies(movieDataSortedByBudget, timestamp)*/
 
     // Objective 5:
     budgetVersusMovieRating(movieDataSortedByBudget, timestamp)
@@ -243,12 +243,12 @@ object App {
 
     // Plot graph of budget (x) vs rating (y)
     val xs0 = top500Budget.map(_._5).collect().toList
-    val ys0 = top500Budget.map(_._3.round).collect().toList
-    val plot0 = Plot().withScatter(xs0, ys0, ScatterOptions().mode(ScatterMode.Line))
+    val ys0 = top500Budget.map(_._3.toDouble).collect().toList
+    val plot0 = Plot().withScatter(xs0, ys0, ScatterOptions().mode(ScatterMode.Marker))
     draw(plot0, "budget-vs-rating", writer.FileOptions(overwrite=true))
 
     // Plot graph of budget (x) vs rating (y)
-    val plot1 = Plot().withScatter(ys0, xs0, ScatterOptions().mode(ScatterMode.Line))
+    val plot1 = Plot().withScatter(ys0, xs0, ScatterOptions().mode(ScatterMode.Marker))
     draw(plot1, "rating-vs-budget", writer.FileOptions(overwrite=true))
   }
 }

@@ -1,0 +1,17 @@
+Action	284
+Adventure	280
+Science Fiction	145
+Fantasy	140
+Thriller	133
+Comedy	122
+Drama	122
+Family	120
+Animation	75
+Crime	42
+Romance	37
+Mystery	31
+History	30
+War	23
+Horror	13
+Western	10
+Music	9

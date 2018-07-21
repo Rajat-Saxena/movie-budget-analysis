@@ -107,7 +107,7 @@ Rank | Genre | Count
 ### Best small budget movies
 For this finding, I restricted movies with budget in the first quartile (without adjustment). I also added a filter for movies to have a minimum rating of 6.0 and having at least 10 votes.
 
-The most famous movies in this list are _Whiplash, 12 Angry Men, Pulp Fiction_, and _One Flew Over the Cuckoo's Nest_.
+Popular movies in this list are _Whiplash, 12 Angry Men, Pulp Fiction_, and _One Flew Over the Cuckoo's Nest_.
 
 Rank | Movie | Year | Budget | Rating | Votes
 -----|-------|------|--------|--------|-------
@@ -136,3 +136,57 @@ Rank | Movie | Year | Budget | Rating | Votes
 23|Louis C.K.: Live at the Beacon Theater | 2011 | $278,459.00 | 8.1 | 73
 24|Who's Singin' Over There? | 1980 | $364,872.00 | 8.1 | 30
 25|Carrossel - O Filme | 2015 | $2,194,517.00 | 8.1 | 19
+
+### Production company of most expensive movies
+From the 500 most expensive movies of all time, I extracted the production company and the number of movies produced by it, along with the aggregate money pumped into them. No real surprises here.
+
+Rank | Production Company | Count | Aggregate Spending
+-----|--------------------|-------|----------------
+1|Walt Disney Pictures | 57 | $10,777,976,401.00
+2|Paramount Pictures | 49 | $9,266,424,661.00
+3|Columbia Pictures | 40 | $6,740,078,866.00
+4|Universal Pictures | 34 | $5,394,587,153.00
+5|Twentieth Century Fox Film Corporation | 30 | $4,665,011,910.00
+6|Village Roadshow Pictures | 23 | $3,480,891,143.00
+7|Warner Bros. | 13 | $2,377,873,553.00
+8|DreamWorks SKG | 12 | $1,754,124,813.00
+9|DreamWorks Animation | 12 | $1,972,371,970.00
+10|Ingenious Film Partners | 11 | $1,816,334,130.00
+11|Marvel Studios | 10 | $1,906,902,881.00
+12|New Line Cinema | 10 | $1,445,345,001.00
+13|Imagine Entertainment | 9 | $1,394,623,863.00
+14|Jerry Bruckheimer Films | 8 | $1,246,051,015.00
+15|TriStar Pictures | 8 | $1,102,809,256.00
+16|Legendary Pictures | 7 | $1,366,543,968.00
+17|Columbia Pictures Corporation | 7 | $1,079,644,246.00
+18|Lucasfilm | 6 | $1,168,084,212.00
+19|Summit Entertainment | 6 | $749,035,172.00
+20|WingNut Films | 6 | $1,331,394,222.00
+21|DC Comics | 5 | $1,186,929,268.00
+22|Eon Productions | 5 | $988,870,871.00
+23|Amblin Entertainment | 5 | $809,069,802.00
+24|Silver Pictures | 4 | $585,819,916.00
+25|Studio Babelsberg | 4 | $742,782,358.00
+
+### High budget and a good movie
+Does an expensively made movie guarantee success? Or is it always a low-budget movie that gains popularity? Here are two visualizations comparing movie budget and movie rating for the top 500 most expensive movies. I have removed outliers for better comprehension.
+
+#### Movie Rating vs Movie Budget
+<div>
+    <a href="https://plot.ly/~rajatsaxena/28/?share_key=Yr1RPypXEtjti1NgZTPKnj" title="Movie Rating vs Movie Budget" style="display: block; text-align: center;"><img src="https://plot.ly/~rajatsaxena/28.png?share_key=Yr1RPypXEtjti1NgZTPKnj" alt="Movie Rating vs Movie Budget" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="rajatsaxena:28" sharekey-plotly="Yr1RPypXEtjti1NgZTPKnj" src="https://plot.ly/embed.js" async></script>
+</div>
+
+#### Movie Budget vs Movie Rating
+<div>
+    <a href="https://plot.ly/~rajatsaxena/26/?share_key=7Rpnoxxd1tOcz1tSwYLgMN" title="Movie Budget vs Movie Rating" style="display: block; text-align: center;"><img src="https://plot.ly/~rajatsaxena/26.png?share_key=7Rpnoxxd1tOcz1tSwYLgMN" alt="Movie Budget vs Movie Rating" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="rajatsaxena:26" sharekey-plotly="7Rpnoxxd1tOcz1tSwYLgMN" src="https://plot.ly/embed.js" async></script>
+</div>
+
+It seems difficult to find a conclusion from the scatter plots.
+
+### Conclusion
+While there seems to be no direct correlation between budget and rating, I am going to make a conclusion:
+> For any decent movie (rating > 7), the optimum production budget is $200M.
+
+Of course, there will always be exceptions.
